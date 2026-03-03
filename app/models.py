@@ -19,9 +19,9 @@ class User(SQLModel, table=True):
         return f"(User id={self.id}, username={self.username} ,email={self.email})"
 
 class TodoCategory(SQLModel, table=True):
-    # Implementation of the TodoCategory model from task 5.1 here
-    pass
-
+    todo_id: int|None = Field(primary_key=True, foreign_key='todo.id')
+    category_id: int|None = Field(primary_key=True, foreign_key='category.id')
+    
 
 class Todo(SQLModel, table=True):
     id: Optional[int] =  Field(default=None, primary_key=True)
@@ -32,11 +32,15 @@ class Todo(SQLModel, table=True):
 
     user: User = Relationship(back_populates="todos")
 
-    ## Task 3.4 implementation should go here as well
+    def toggle(self):
+        self.done = not self.done
 
-    # Task 5.2 code should go here
+    categories: list['Category'] = Relationship(back_populates=("todos"), link_model=TodoCategory)
     
     
 class Category(SQLModel, table=True):
-    # Implementation of the Category model from task 5.1 here
-    pass
+    id: Optional[int] =  Field(default=None, primary_key=True)
+    user_id: int = Field(foreign_key='user.id') #set user_id as a foreign key to user.id 
+    text: str = Field(max_length=255)
+
+    todos: list['Todo'] = Relationship(back_populates=("categories"), link_model=TodoCategory)
