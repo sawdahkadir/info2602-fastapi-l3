@@ -10,9 +10,7 @@ class User(SQLModel, table=True):
     email:str = Field(index=True, unique=True)
     password:str
 
-    ## Task 3.1 code should go here (special care should go into the indentation)
-
-    ## End of task 3.1 code
+    todos: list['Todo'] = Relationship(back_populates="user")
 
     def set_password(self, plaintext_password):
         self.password = password_hash.hash(plaintext_password)
@@ -26,10 +24,13 @@ class TodoCategory(SQLModel, table=True):
 
 
 class Todo(SQLModel, table=True):
-    ## Task 2.1 implementation here. Remove the line below that says "pass" once completed
-    pass
+    id: Optional[int] =  Field(default=None, primary_key=True)
+    user_id: int = Field(foreign_key='user.id') #set user_id as a foreign key to user.id 
+    text: str = Field(max_length=255)
+    done: bool = Field(default=False)
+    # done: bool = False  # <---- can also be written this way if you prefer a pythonic default
 
-    ## Task 3.2 implementation should go here as well. Modify the class like you did for 3.1 above
+    user: User = Relationship(back_populates="todos")
 
     ## Task 3.4 implementation should go here as well
 
